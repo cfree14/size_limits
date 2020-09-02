@@ -52,16 +52,12 @@ fisheries <- data %>%
   # Arrange by gear type
   arrange(fishing_entity, fishing_sector, gear_type, fishery)
 
-
-
-
 # Gears
-
-# Build recent year stats
 gears <- data %>% 
   # Group by sector-gear
   group_by(fishing_sector, gear_type, year) %>% 
-  summarize(catch_mt=sum(catch_mt)) %>% 
+  summarize(nfisheries=n_distinct(fishery),
+            catch_mt=sum(catch_mt)) %>% 
   ungroup() %>% 
   # 2014
   filter(year==max(year)) %>% 
@@ -69,6 +65,9 @@ gears <- data %>%
   mutate(catch_prop=catch_mt/sum(catch_mt)) %>% 
   # Arrange by gear type
   arrange(fishing_sector, gear_type)
+
+# Confirm number of fisheries
+sum(gears$nfisheries) == nrow(fisheries)
 
 # Export data
 save(data, fisheries, gears, file=file.path(datadir, "SAUP_reported_catch_by_country_sectors_gears.Rdata"))
